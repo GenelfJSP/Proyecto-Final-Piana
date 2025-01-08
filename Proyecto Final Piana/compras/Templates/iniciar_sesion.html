@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<h3>Iniciar sesión</h3>
+
+<form method="POST" action="{% url 'iniciar_sesion' %}">
+    {% csrf_token %}
+    <label for="username">Usuario:</label>
+    <input type="text" name="username" id="username" required><br></a></p>
+    <label for="password">Contraseña:</label>
+    <input type="password" name="password" id="password" required><br></a></p>
+    <button type="submit">Iniciar sesión</button>
+</form>
+
+<p><a href="{% url 'reestablecimiento_contraseña' %}">¿Olvidaste tu contraseña?</a></p>
+
+{% endblock %}

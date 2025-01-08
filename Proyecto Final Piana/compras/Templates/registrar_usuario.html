@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Usuario{% endblock %}
+
+{% block content %}
+<h3>Registrarse</h3>
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<form method="POST" action="{% url 'registrar_usuario' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <button type="submit">Registrar</button>
+</form>
+
+<p>Si ya tienes cuenta, <a href="{% url 'iniciar_sesion' %}">inicia sesión aquí</a>.</p>
+
+{% endblock %}

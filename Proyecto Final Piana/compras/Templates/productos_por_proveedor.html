@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Productos de {{ proveedor.nombre_proveedor }}{% endblock %}
+
+{% block header_title %}Productos de {{ proveedor.nombre_proveedor }}{% endblock %}
+
+{% block content %}
+    <h3>Productos del proveedor {{ proveedor.nombre_proveedor }}</h3>
+    <ul>
+        {% for producto in productos %}
+            <li>{{ producto.nombre_producto }}: {{ producto.descripcion }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

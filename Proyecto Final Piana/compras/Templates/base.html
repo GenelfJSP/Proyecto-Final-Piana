@@ -1,0 +1,60 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Compras{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <h1>{% block header_title %}Bienvenido al Sistema de Compras{% endblock %}</h1>
+        
+        <!-- Mensajes de estado del usuario (antes de los enlaces) -->
+        <div class="user-status-message">
+            {% if user.is_authenticated %}
+                <p>Bienvenido, {{ user.username }}. <a href="{% url 'cerrar_sesion' %}">Cerrar sesión</a></p>
+            {% else %}
+                <p>Usuario no iniciado</p>
+            {% endif %}
+
+            <!-- Mensaje de sesión cerrada -->
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert {{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Navegación -->
+        <nav>
+            <ul>
+                {% if request.path != '/' %}
+                    <li><a href="/">Inicio</a></li>
+                {% endif %}
+                {% if request.path != '/usuarios/' %}
+                    <li><a href="/usuarios/">Usuarios</a></li>
+                {% endif %}
+                {% if request.path != '/productos/' %}
+                    <li><a href="/productos/">Productos</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2024 Sistema de Compras</p>
+    </footer>
+</body>
+</html>

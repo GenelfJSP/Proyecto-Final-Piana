@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Productos{% endblock %}
+
+{% block header_title %}Lista de Productos{% endblock %}
+
+{% block content %}
+    <ul>
+        {% for producto in productos %}
+            <li>{{ producto.nombre_producto }}: {{ producto.descripcion }}
+                <a href="{% url 'eliminar_producto' producto.id %}">Eliminar</a>
+            </li>
+        {% empty %}
+            <li>No hay productos registrados.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

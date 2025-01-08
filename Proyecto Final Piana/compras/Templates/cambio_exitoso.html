@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %}Cambio exitoso{% endblock %}
+
+{% block content %}
+<h2>Cambio realizado con éxito</h2>
+<p>El nombre de usuario <strong>{{ username }}</strong> ahora tiene la siguiente contraseña:</p>
+<p><strong>{{ nueva_contraseña }}</strong></p>
+<a href="{% url 'iniciar_sesion' %}">Iniciar sesión</a>
+{% endblock %}
