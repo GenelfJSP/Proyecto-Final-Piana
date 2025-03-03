@@ -1,9 +1,0 @@
-{% extends 'base.html' %}
-
-{% block title %}No se puede eliminar proveedor{% endblock %}
-
-{% block header_title %}Error al eliminar proveedor{% endblock %}
-
-{% block content %}
-    <p>No se puede eliminar el proveedor {{ proveedor.nombre_proveedor }} porque tiene productos asociados.</p>
-{% endblock %}
