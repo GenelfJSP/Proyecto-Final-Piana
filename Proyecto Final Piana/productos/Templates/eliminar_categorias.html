@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Eliminar Categoría - Sistema de Compras{% endblock %}
+
+{% block content %}
+    <h2>Eliminar Categorías</h2>
+
+    <h3>Categorías sin asignar a ningún proveedor (pueden ser eliminadas):</h3>
+    <ul>
+        {% for categoria in categorias %}
+            {% if categoria.proveedores.count == 0 %}
+                <li>
+                    {{ categoria.nombre }}
+                    <!-- Formulario para eliminar la categoría completamente -->
+                    <form method="post" action="{% url 'eliminar_categoria' proveedor_id=proveedor.id categoria_id=categoria.id %}">
+                        {% csrf_token %}
+                        <button type="submit" style="color: red;">Eliminar Categoría</button>
+                    </form>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <br><br>
+    <a href="{% url 'listar_proveedores' %}">Volver a la lista de proveedores</a>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Productos - Sistema de Compras{% endblock %}
+
+{% block content %}
+    <h2>Agregar Proveedor</h2>
+    <!-- Agregar el atributo enctype para soportar la subida de archivos -->
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+    
+        <div class="form-group">
+            <label for="nombre">Nombre del Proveedor</label>
+            <input type="text" id="nombre" name="nombre" required class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <input type="text" id="descripcion" name="descripcion" required class="form-control">
+        </div>
+
+        <!-- Aquí seleccionas una categoría existente -->
+        <div class="form-group">
+            <label for="categoria">Categoría</label>
+            <select name="categoria" id="categoria" class="form-control">
+                <option value="" selected disabled>Seleccione una categoría</option>
+                {% for option in form.categoria.field.queryset %}
+                    <option value="{{ option.id }}">{{ option.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="nueva_categoria">Nueva Categoría</label>
+            <input type="text" id="nueva_categoria" name="nueva_categoria" class="form-control">
+        </div>
+        
+        <div class="form-group">
+            <label for="logotipo">Logotipo</label>
+            <input type="file" id="logotipo" name="logotipo" class="form-control">
+        </div>
+
+        <p><button type="submit" id="guardar-btn">Guardar</button></p>
+    </form>
+
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        #guardar-btn {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            text-align: center;
+        }
+    
+        #guardar-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+    
+        #guardar-btn:active {
+            transform: scale(0.98);
+        }
+    </style>
+
+{% endblock %}

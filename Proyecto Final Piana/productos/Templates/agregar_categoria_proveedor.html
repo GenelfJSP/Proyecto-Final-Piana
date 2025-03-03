@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Agregar Categoría a Proveedor - Sistema de Compras{% endblock %}
+
+{% block content %}
+    <h3>Agregar Categoría a: {{ proveedor.nombre }}</h3>
+
+    <!-- Formulario para agregar nueva categoría -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="nueva_categoria">Nombre de la Nueva Categoría:</label>
+            <input type="text" id="nueva_categoria" name="nueva_categoria" required class="form-control">
+        </div>
+        <p><button id="button" type="submit">Agregar Categoría</button></p>
+    </form>
+
+    <p><h4>Categorías que posee:</h4></p>
+    <ul id="categorias-posee-list">
+        {% for categoria in categorias_posee %}
+            <li>
+                <p>{{ categoria.nombre }}</p>
+                
+                <!-- Formulario para quitar la categoría -->
+                <form method="post" action="{% url 'agregar_categoria_proveedor' proveedor_id=proveedor.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="categoria_a_quitar" value="{{ categoria.id }}">
+                    <p><button id="button" type="submit">Quitar Categoría</button></p>
+                </form>
+
+                <!-- Formulario para eliminar la categoría completamente -->
+                <form method="post" action="{% url 'eliminar_categoria' proveedor_id=proveedor.id categoria_id=categoria.id %}">
+                    {% csrf_token %}
+                    <p><button id="button-eliminar" type="submit">Eliminar Categoría</button></p>
+                </form>
+            </li>
+        {% empty %}
+            <li><p>No tiene categorías asignadas.</p></li>
+        {% endfor %}
+    </ul>
+
+    <!-- Controles de paginación para "Categorías que posee" -->
+    {% if categorias_posee.has_other_pages %}
+        <div class="pagination">
+            {% if categorias_posee.has_previous %}
+                <button onclick="window.location.href='?page_posee=1'"><<< </button>
+                <button onclick="window.location.href='?page_posee={{ categorias_posee.previous_page_number }}'">< </button>
+            {% endif %}
+
+            <span>Página {{ categorias_posee.number }} de {{ categorias_posee.paginator.num_pages }}</span>&nbsp;
+
+            {% if categorias_posee.has_next %}
+                <button onclick="window.location.href='?page_posee={{ categorias_posee.next_page_number }}'"> ></button>
+                <button onclick="window.location.href='?page_posee={{ categorias_posee.paginator.num_pages }}'"> >>></button>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if categorias_posee.has_next %}
+        <button id="show-more-posee" onclick="showMore('posee')">Mostrar más</button>
+    {% endif %}
+
+    <p><h4>Demás Categorías:</h4></p>
+    <ul id="otras-categorias-list">
+        {% for categoria in otras_categorias %}
+            <li>
+                <p>{{ categoria.nombre }}</p>
+                
+                <!-- Formulario para eliminar la categoría completamente -->
+                <form method="post" action="{% url 'eliminar_categoria' proveedor_id=proveedor.id categoria_id=categoria.id %}">
+                    {% csrf_token %}
+                    <p><button id="button-eliminar" type="submit">Eliminar Categoría</button></p>
+                </form>
+            </li>
+        {% empty %}
+            <li><p>No hay categorías disponibles.</p></li>
+        {% endfor %}
+    </ul>
+
+    <!-- Controles de paginación para "Demás Categorías" -->
+    {% if otras_categorias.has_other_pages %}
+        <div class="pagination">
+            {% if otras_categorias.has_previous %}
+                <button onclick="window.location.href='?page_otras=1'"><<< </button>
+                <button onclick="window.location.href='?page_otras={{ otras_categorias.previous_page_number }}'">< </button>
+            {% endif %}
+
+            <span>Página {{ otras_categorias.number }} de {{ otras_categorias.paginator.num_pages }}</span>&nbsp;
+
+            {% if otras_categorias.has_next %}
+                <button onclick="window.location.href='?page_otras={{ otras_categorias.next_page_number }}'"> ></button>
+                <button onclick="window.location.href='?page_otras={{ otras_categorias.paginator.num_pages }}'"> >>></button>
+            {% endif %}
+        </div>
+        <p></p>
+    {% endif %}
+
+    {% if otras_categorias.has_next %}
+        <button id="show-more-otras" onclick="showMore('otras')">Mostrar más</button>
+        <p></p>
+    {% endif %}
+
+    <p><a href="{% url 'listar_proveedores' %}">Volver a la lista de proveedores</a></p>
+
+    <style>
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        
+        /* Estilos para los botones de paginación y "Mostrar más" */
+        .pagination button, #show-more-posee, #show-more-otras {
+            padding: 5px 8px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+    
+        .pagination button:hover, #show-more-posee:hover, #show-more-otras:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+    
+        .pagination button:active, #show-more-posee:active, #show-more-otras:active {
+            transform: scale(0.98);
+        }
+    
+        #show-more-posee, #show-more-otras {
+            margin-top: 20px;
+            padding: 12px 20px;
+        }
+    
+        /* Estilos para los botones de Quitar, Eliminar y Agregar Categoría */
+        #button, #button-eliminar {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            text-align: center;
+        }
+    
+        #button:hover, #button-eliminar:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+    
+        #button:active, #button-eliminar:active {
+            transform: scale(0.98);
+        }
+    
+        /* Estilo específico para el botón de eliminar */
+        #button-eliminar {
+            background-color: #dc3545;
+        }
+    
+        #button-eliminar:hover {
+            background-color: #c82333;
+        }
+
+    </style>
+    
+    <script>
+
+        // Pasar las URLs y el token CSRF generados en el servidor a JavaScript
+        const eliminarCategoriaBaseUrl = "{{ eliminar_categoria_url }}";
+        const agregarCategoriaUrl = "{{ agregar_categoria_url }}";
+        const csrfToken = "{{ csrf_token }}";
+        const categoriasPorClick = "{{ categorias_por_click }}";
+        
+        let offsetPosee = parseInt('{{ offset_posee }}');
+        let offsetOtras = parseInt('{{ offset_otras }}');
+        
+        function showMore(tipo) {
+            let offset = tipo === 'posee' ? offsetPosee : offsetOtras;
+            fetch(`?tipo=${tipo}&offset=${offset}`, {
+                method: 'GET',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.categorias.length > 0) {
+                    let listId = tipo === 'posee' ? 'categorias-posee-list' : 'otras-categorias-list';
+                    let userList = document.getElementById(listId);
+                    
+                    // Añadir nuevas categorías sin duplicarlas
+                    data.categorias.forEach(categoria => {
+                        let newItem = document.createElement('li');
+                        newItem.innerHTML = `
+                            <p>${categoria.nombre}</p>
+                            <form method="post" action="${agregarCategoriaUrl}">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                                <input type="hidden" name="categoria_a_quitar" value="${categoria.id}">
+                                <p><button id="button" type="submit">Quitar Categoría</button></p>
+                            </form>
+                            <form method="post" action="${eliminarCategoriaBaseUrl.replace('0', categoria.id)}">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                                <p><button id="button-eliminar" type="submit">Eliminar Categoría</button></p>
+                            </form>
+                        `;
+                        userList.appendChild(newItem);
+                    });
+    
+                    // Actualizar el offset para la próxima carga
+                    if (tipo === 'posee') {
+                        offsetPosee = data.new_offset;
+                    } else {
+                        offsetOtras = data.new_offset;
+                    }
+    
+                    if (!data.has_next) {
+                        document.getElementById(`show-more-${tipo}`).style.display = 'none';
+                    }
+                }
+            });
+        }
+    </script>
+    
+{% endblock %}

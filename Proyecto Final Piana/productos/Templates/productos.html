@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block header_title %}Productos - Sistema de Compras{% endblock %}
+
+{% block content %}
+    <h2>Bienvenido a la sección de productos</h2>
+    
+    <p><a href="{% url 'agregar_producto' %}">Agregar Producto</a></p>
+    <p><a href="{% url 'agregar_proveedor' %}">Agregar Proveedor</a></p>
+    <p><a href="{% url 'listar_productos' %}">Ver todos los productos</a></p>
+    <p><a href="{% url 'listar_proveedores' %}">Ver todos los proveedores</a></p>
+    <p><a href="{% url 'buscar_productos_por_proveedor' %}">Buscar productos por proveedor</a></p>
+    <p><a href="{% url 'buscar_proveedores_por_producto' %}">Buscar proveedores por producto</a></p>
+    <p><a href="{% url 'buscar_productos_por_categoria' %}">Buscar productos por categoria</a></p>
+    <p><a href="{% url 'buscar_proveedores_por_categoria' %}">Buscar proveedores por categoria</a></p>
+
+    <style>
+        .card {
+            max-width: 300px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin: auto;
+        }
+        .card-img-top {
+            width: 100%;
+            height: auto;
+            max-height: 120px;
+            object-fit: contain;
+            display: block;
+            margin: auto;
+            padding: 5px;
+        }
+        .row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .col-md-4 {
+            margin-bottom: 20px;
+        }
+        .column-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .hidden {
+            visibility: hidden;
+        }
+    </style>
+    
+    <div class="container">
+        <div id="card-container">
+            <div class="row">
+                <div class="col-md-4"><h2 class="column-title">Categorías</h2></div>
+                <div class="col-md-4"><h2 class="column-title">Productos</h2></div>
+                <div class="col-md-4"><h2 class="column-title">Proveedores</h2></div>
+            </div>
+            {% for categoria, producto, proveedor in categorias_productos_proveedores %}
+                <div class="row mb-4 {% if forloop.counter > cantidad_a_mostrar %}d-none{% endif %}">
+                    <!-- Columna de Categoría -->
+                    <div class="col-md-4">
+                        <div class="card {% if not categoria %}hidden{% endif %}">
+                            {% if categoria %}
+                                <img src="{% if categoria.foto %}{{ categoria.foto.url }}{% else %}{% static 'img/default_category.png' %}{% endif %}" 
+                                     class="card-img-top" alt="Categoría">
+                                <div class="card-body">
+                                    <h5 class="card-title"><strong>Nombre: </strong>{{ categoria.nombre }}</h5>
+                                    <a href="{% url 'producto_por_categoria' %}?q={{ categoria.nombre }}" class="btn btn-primary">Ver más</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+    
+                    <!-- Columna de Producto -->
+                    <div class="col-md-4">
+                        <div class="card {% if not producto %}hidden{% endif %}">
+                            {% if producto %}
+                                <img src="{% if producto.foto %}{{ producto.foto.url }}{% else %}{% static 'img/default_product.png' %}{% endif %}" 
+                                     class="card-img-top" alt="{{ producto.nombre_Producto }}">
+                                <div class="card-body">
+                                    <h5 class="card-title"><strong>Nombre: </strong>{{ producto.nombre_Producto }}</h5>
+                                    <p class="card-text"><strong>Descripción: </strong>{{ producto.descripcion|default:"&nbsp;" }}</p>
+                                    <p class="card-text"><strong>Publicación: </strong>{{ producto.fecha_publicacion|default:"&nbsp;" }}</p>
+                                    <p class="card-text"><strong>Categoría: </strong>{{ producto.categoria.nombre|default:"&nbsp;" }}</p>
+                                    <p class="card-text"><strong>Proveedor: </strong>{{ producto.proveedor.nombre|default:"&nbsp;" }}</p>
+                                    <a href="{% url 'buscar_proveedores_por_producto' %}?q={{ producto.nombre_Producto }}&from_card=true" class="btn btn-primary">Ver más</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+    
+                    <!-- Columna de Proveedor -->
+                    <div class="col-md-4">
+                        <div class="card {% if not proveedor %}hidden{% endif %}">
+                            {% if proveedor %}
+                                <img src="{% if proveedor.logotipo %}{{ proveedor.logotipo.url }}{% else %}{% static 'img/default_proveedor.png' %}{% endif %}" 
+                                     class="card-img-top" alt="{{ proveedor.nombre }}">
+                                <div class="card-body">
+                                    <h5 class="card-title"><strong>Nombre: </strong>{{ proveedor.nombre }}</h5>
+                                    <p class="card-text"><strong>Descripción: </strong>{{ proveedor.descripcion|default:"&nbsp;" }}</p>
+                                    <p class="card-text"><strong>Creación: </strong>{{ proveedor.fecha_creacion|default:"&nbsp;" }}</p>
+                                    {% if proveedor.categorias.all %}
+                                        <p class="card-text"><strong>Categorías: </strong>
+                                            {% for categoria in proveedor.categorias.all %}
+                                                {{ categoria.nombre }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                    <a href="{% url 'buscar_productos_por_proveedor' %}?q={{ proveedor.nombre }}" class="btn btn-primary">Ver más</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    
+        <!-- Botón de Ver más para cargar más elementos -->
+        <div class="load-more-container text-center">
+            <button class="btn btn-primary" id="cargar-todo">Ver más</button>
+        </div>
+    </div>
+    
+    <script>
+        // Pasar variables de Django a JavaScript
+        const cardsToShow = parseInt("{{ cards_per_click }}");  // Convertir a número
+        const maxCards = parseInt("{{ max_cards }}");           // Convertir a número
+        const cantidadAMostrar = parseInt("{{ cantidad_a_mostrar }}");  // Convertir a número
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const loadMoreButton = document.getElementById("cargar-todo");
+            const cardContainer = document.getElementById("card-container");
+            const hiddenCards = cardContainer.querySelectorAll(".d-none");
+
+            // Ocultar el botón si no hay cards ocultas al inicio
+            if (hiddenCards.length === 0) {
+                if (loadMoreButton) {
+                    loadMoreButton.style.display = "none";
+                }
+            }
+
+            if (loadMoreButton) {
+                loadMoreButton.addEventListener("click", function () {
+                    // Mostrar las siguientes cards_per_click cards ocultas
+                    let cardsShown = 0;
+                    hiddenCards.forEach(card => {
+                        if (cardsShown < cardsToShow && card.classList.contains("d-none")) {
+                            card.classList.remove("d-none");
+                            cardsShown++;
+                        }
+                    });
+
+                    // Ocultar el botón si no hay más cards ocultas
+                    const remainingHiddenCards = cardContainer.querySelectorAll(".d-none").length;
+                    if (remainingHiddenCards === 0 && loadMoreButton) {
+                        loadMoreButton.style.display = "none";
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

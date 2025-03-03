@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Productos - Sistema de Compras{% endblock %}
+
+{% block content %}
+    <h2>Lista de Productos</h2>
+
+    <ul id="product-list">
+        {% for producto in productos %}
+            <li>
+                <strong>{{ producto.nombre_Producto }}</strong>: {{ producto.descripcion }} <br>
+                <strong>Categoría:</strong> {{ producto.categoria.nombre }} <br>
+                <strong>Proveedor:</strong> {{ producto.proveedor.nombre }} <br>
+                <strong>Fecha de Publicacion:</strong> {{ producto.fecha_publicacion }} <br>
+                <strong>Foto:</strong>
+                {% if producto.foto %}
+                    <img src="{{ producto.foto.url }}" alt="{{ producto.nombre_Producto }}" width="100">
+                {% else %}
+                    No posee
+                {% endif %}
+                <br>
+                <a href="{% url 'eliminar_producto' producto.id %}">Eliminar</a><br><br>
+            </li>
+        {% empty %}
+            <li>No hay productos registrados.</li>
+        {% endfor %}
+    </ul>
+    
+    <!-- Controles de paginación clásica -->
+    {% if productos.has_other_pages %}
+        <div class="pagination">
+            {% if productos.has_previous %}
+                <button onclick="window.location.href='?page=1'"><<<</button>
+                <button onclick="window.location.href='?page={{ productos.previous_page_number }}'"><</button>
+            {% endif %}
+
+            <span>Página {{ productos.number }} de {{ productos.paginator.num_pages }}</span>&nbsp;
+
+            {% if productos.has_next %}
+                <button onclick="window.location.href='?page={{ productos.next_page_number }}'">></button>
+                <button onclick="window.location.href='?page={{ productos.paginator.num_pages }}'">>>></button>
+            {% endif %}
+        </div>
+        <p></p>
+    {% endif %}
+
+    <!-- Botón "Mostrar más" para cargar más productos mediante AJAX -->
+    {% if productos.has_next %}
+        <button id="show-more" onclick="showMore()">Mostrar más</button>
+        <p></p>
+    {% endif %}
+
+    <style>
+        .pagination button {
+            padding: 5px 8px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .pagination button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .pagination button:active {
+            transform: scale(0.98);
+        }
+        #show-more {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            text-align: center;
+        }
+        #show-more:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        #show-more:active {
+            transform: scale(0.98);
+        }
+    </style>
+
+    <script>
+        // Se inicializa el offset (la cantidad de productos ya cargados) según el valor enviado desde la vista
+        let offset = parseInt('{{ offset }}');
+
+        function showMore() {
+            // Realiza una petición AJAX enviando el offset actual
+            fetch(`?offset=${offset}`, {
+                method: 'GET',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.productos.length > 0) {
+                    let productList = document.getElementById('product-list');
+
+                    // Por cada producto obtenido en la respuesta se crea un nuevo <li> y se añade a la lista
+                    data.productos.forEach(function(producto) {
+                        let li = document.createElement('li');
+                        let html = `<strong>${producto.nombre_Producto}</strong>: ${producto.descripcion}<br>
+                                    <strong>Categoría:</strong> ${producto['categoria__nombre']}<br>
+                                    <strong>Proveedor:</strong> ${producto['proveedor__nombre']}<br>
+                                    <strong>Fecha de Publicacion:</strong> ${new Date(producto.fecha_publicacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}<br>
+                                    <strong>Foto:</strong> `;
+                        if (producto.foto) {
+                            // Si 'producto.foto' contiene la URL de la imagen, se inserta la imagen
+                            html += `<img src="/media/${producto.foto}" alt="${producto.nombre_Producto}" width="100">`;
+                        } else {
+                            html += 'No posee';
+                        }
+                        html += `<br><a href="/eliminar_producto/${producto.id}">Eliminar</a><br><br>`;
+                        li.innerHTML = html;
+                        productList.appendChild(li);
+                    });
+
+                    // Actualizamos el offset para la siguiente petición
+                    offset = data.new_offset;
+
+                    // Si ya no hay más productos, ocultamos el botón "Mostrar más"
+                    if (!data.has_next) {
+                        document.getElementById('show-more').style.display = 'none';
+                    }
+                }
+            });
+        }
+    </script>
+
+{% endblock %}

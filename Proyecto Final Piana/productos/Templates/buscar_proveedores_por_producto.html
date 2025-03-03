@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Productos - Sistema de Compras{% endblock %}
+
+{% block content %}
+    <h2>Buscar Proveedores por Producto</h2>
+
+    <!-- Formulario de búsqueda -->
+    <form method="POST" action="{% url 'buscar_proveedores_por_producto' %}">
+        {% csrf_token %}
+        <p>
+            <label for="producto">Producto</label>
+            <select name="producto" class="form-control">
+                <option value="">-- Selecciona un producto --</option>
+                {% for producto in productos %}
+                    <option value="{{ producto.nombre_Producto }}" {% if producto.nombre_Producto == producto_seleccionado %}selected{% endif %}>
+                        {{ producto.nombre_Producto }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" id="buscar-btn">Buscar</button>
+        </p>
+    </form>
+
+    <!-- Resultados de la búsqueda -->
+    {% if proveedores %}
+        <p><h4>Proveedores para el producto "{{ producto_seleccionado }}":</h4></p>
+        <ul id="proveedor-list">
+            {% for proveedor in proveedores %}
+                <li>
+                    <strong>{{ proveedor.nombre }}</strong>: {{ proveedor.descripcion }} <br>
+                    <strong>Logotipo:</strong>
+                    {% if proveedor.logotipo %}
+                        <img src="{{ proveedor.logotipo.url }}" alt="{{ proveedor.nombre }}" width="100">
+                    {% else %}
+                        No posee
+                    {% endif %}
+                    <br><br>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Controles de paginación clásica -->
+        {% if proveedores.has_other_pages %}
+            <div class="pagination">
+                {% if proveedores.has_previous %}
+                    <button onclick="window.location.href='?page=1&q={{ producto_seleccionado }}'"><<<</button>
+                    <button onclick="window.location.href='?page={{ proveedores.previous_page_number }}&q={{ producto_seleccionado }}'"><</button>
+                {% endif %}
+
+                <span>Página {{ proveedores.number }} de {{ proveedores.paginator.num_pages }}</span>&nbsp;
+
+                {% if proveedores.has_next %}
+                    <button onclick="window.location.href='?page={{ proveedores.next_page_number }}&q={{ producto_seleccionado }}'">></button>
+                    <button onclick="window.location.href='?page={{ proveedores.paginator.num_pages }}&q={{ producto_seleccionado }}'">>>></button>
+                {% endif %}
+            </div>
+            <p></p>
+        {% endif %}
+
+        <!-- Botón "Mostrar más" para cargar más proveedores mediante AJAX -->
+        {% if proveedores.has_next %}
+            <button id="show-more" onclick="showMore()">Mostrar más</button>
+            <p></p>
+        {% endif %}
+    {% elif mensaje %}
+        <p>{{ mensaje }}</p>
+    {% endif %}
+
+    <style>
+        /* Estilos para el formulario y botones */
+        .form-control {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        #buscar-btn {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        #buscar-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        #buscar-btn:active {
+            transform: scale(0.98);
+        }
+
+        .pagination button {
+            padding: 5px 8px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .pagination button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .pagination button:active {
+            transform: scale(0.98);
+        }
+
+        #show-more {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        #show-more:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        #show-more:active {
+            transform: scale(0.98);
+        }
+    </style>
+
+    <script>
+        // Se inicializa el offset (la cantidad de proveedores ya cargados) según el valor enviado desde la vista
+        let offset = parseInt('{{ offset }}');
+        let producto = '{{ producto_seleccionado }}';
+
+        function showMore() {
+            console.log("Cargando más proveedores...");  // Depuración
+            fetch(`?offset=${offset}&q=${producto}`, {
+                method: 'GET',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Respuesta recibida:", data);  // Depuración
+                if (data.proveedores.length > 0) {
+                    let proveedorList = document.getElementById('proveedor-list');
+
+                    // Por cada proveedor obtenido en la respuesta se crea un nuevo <li> y se añade a la lista
+                    data.proveedores.forEach(function(proveedor) {
+                        let li = document.createElement('li');
+                        let html = `<strong>${proveedor.nombre}</strong>: ${proveedor.descripcion}<br>
+                                    <strong>Logotipo:</strong> `;
+                        if (proveedor.logotipo) {
+                            // Si 'proveedor.logotipo' contiene la URL de la imagen, se inserta la imagen
+                            html += `<img src="/media/${proveedor.logotipo}" alt="${proveedor.nombre}" width="100">`;
+                        } else {
+                            html += 'No posee';
+                        }
+                        html += `<br><br>`;
+                        li.innerHTML = html;
+                        proveedorList.appendChild(li);
+                    });
+
+                    // Actualizamos el offset para la siguiente petición
+                    offset = data.new_offset;
+
+                    // Si ya no hay más proveedores, ocultamos el botón "Mostrar más"
+                    if (!data.has_next) {
+                        document.getElementById('show-more').style.display = 'none';
+                    }
+                }
+            })
+            .catch(error => console.error('Error al cargar más proveedores:', error));
+        }
+    </script>
+{% endblock %}
