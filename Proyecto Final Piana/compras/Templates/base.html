@@ -1,0 +1,96 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Compras{% endblock %}</title>
+
+    <!-- Incluir Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Tu archivo de estilos personalizado -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <h1>{% block header_title %}Bienvenido al Sistema de Compras{% endblock %}</h1>
+
+        <!-- Mensajes de estado del usuario (antes de los enlaces) -->
+        <div class="user-status-message">
+            {% if user.is_authenticated %}
+                <p>Bienvenido, {{ user.username }}. 
+                    <!-- Formulario para cerrar sesión -->
+                    <form action="{% url 'cerrar_sesion' %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <button id="Cerrar-sesión" type="submit">Cerrar sesión</button>
+                    </form>
+                </p>
+            {% else %}
+                <p>Usuario no iniciado, <a href="{% url 'iniciar_sesion' %}">Iniciar sesión</a></p>
+            {% endif %}
+        </div>
+
+        <!-- Mostrar mensajes de error o éxito -->
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Navegación -->
+        <nav>
+            <ul>
+                <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
+                <li><a href="/usuarios/" class="{% if request.path == '/usuarios/' %}active{% endif %}">Usuarios</a></li>
+                <li><a href="/productos/" class="{% if request.path == '/productos/' %}active{% endif %}">Productos</a></li>
+                <li><a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">Acerca de mí</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© {{ current_year }} Sistema de Compras</p>
+    </footer>
+
+    <!-- Incluir Bootstrap JS (opcional, si necesitas funcionalidad como el collapse del menú) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+
+        #Cerrar-sesión {
+            margin-top: 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px; /* Aumenté el padding para hacer el botón más grande */
+            font-size: 14px; /* Aumenté el tamaño de la fuente */
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            text-align: center;
+        }
+    
+        #Cerrar-sesión:hover {
+            background-color: #c82333;
+            transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+        }
+    
+        #Cerrar-sesión:active {
+            transform: scale(0.98); /* Efecto al hacer clic */
+        }
+    </style>
+
+</body>
+</html>
