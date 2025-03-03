@@ -4,7 +4,7 @@ Este es un proyecto hecho en Django para la gestión de usuarios y contenido.
 
 ## Funcionalidades
 
--En todos los apartados se puede: (Tercera pre-entrega Piana/compras/Templates/base.html)
+-En todos los apartados se puede: (compras/Templates/base.html)
 
 	-Iniciar sesion
 
@@ -17,7 +17,7 @@ Este es un proyecto hecho en Django para la gestión de usuarios y contenido.
 	-Ir a "Acerca de mi"
 
 
--En el apatado de "Inicio" se puede: (Tercera pre-entrega Piana/compras/Templates/inicio.html)
+-En el apatado de "Inicio" se puede: (compras/Templates/inicio.html)
 
 	-Ver las cards, que aparecen de forma aleatoria, de Categorias, Productos y Proveedores, con posibilidad de cargar mas hasta un maximo
 
@@ -27,7 +27,7 @@ Este es un proyecto hecho en Django para la gestión de usuarios y contenido.
 
 		-Proveedores, un proveedor aleatorio, con el boton vamos a realizar la busqueda de esta card en "Buscar Productos por Proveedor"
 
--En el apatado de "Usuarios" se puede: (Tercera pre-entrega Piana/usuarios/.....)
+-En el apatado de "Usuarios" se puede: (usuarios/.....)
 
 	-Crear usuario, no se debe estar logueado
 
@@ -40,7 +40,7 @@ Este es un proyecto hecho en Django para la gestión de usuarios y contenido.
 		-Eliminar usuario, no se debe estar logueado
 
 
--En el apatado de "Productos" se puede: (Tercera pre-entrega Piana/productos/.....)
+-En el apatado de "Productos" se puede: (productos/.....)
 
 	-Ir a "Agregar Producto", se debe estar logueado
 
@@ -84,5 +84,5 @@ Este es un proyecto hecho en Django para la gestión de usuarios y contenido.
 		-Proveedores, un proveedor aleatorio, con el boton vamos a realizar la busqueda de esta card en "Buscar Productos por Proveedor"
 
 
--Con "importar_datos.py" (Tercera pre-entrega Piana/importar_datos.py) se cargan los datos guardados en el excel Casos_de_prueba_template.xlsx (Tercera pre-entrega Piana/Casos_de_prueba_template.xlsx), las fotos deben ser "Vinculos" para poder ser correctamente guardadas (sobre la celda click derecho y "Vinculo)
+-Con "importar_datos.py" (importar_datos.py) se cargan los datos guardados en el excel Casos_de_prueba_template.xlsx (Casos_de_prueba_template.xlsx), las fotos deben ser "Vinculos" para poder ser correctamente guardadas (sobre la celda click derecho y "Vinculo)
 
