@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Usuarios - Sistema de Compras{% endblock %}
+
+{% block content %}
+    <h2>Restablecer Contraseña</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Usuario:</label>
+            <input type="text" name="username" id="username" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="new_password">Nueva Contraseña:</label>
+            <input type="password" name="nueva_contraseña" id="new_password" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirmar Contraseña:</label>
+            <input type="password" name="confirmar_contraseña" id="confirm_password" required class="form-control">
+        </div>
+        
+        <p><button id="button" type="submit">Enviar enlace de restablecimiento</button></p>
+    </form>
+
+    <style>
+        /* Estilo para los campos de entrada */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            max-width: 400px; /* Limita el tamaño máximo de los campos */
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        #button {
+            margin-top: 20px;
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+        }
+
+        #button:active {
+            transform: scale(0.98); /* Efecto al hacer clic */
+        }
+    </style>
+
+{% endblock %}

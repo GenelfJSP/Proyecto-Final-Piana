@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Usuarios - Sistema de Compras{% endblock %}
+
+{% block content %}
+    <h2>Usuarios Registrados</h2>
+
+    <ul id="user-list">
+        {% for usuario in usuarios %}
+            <li class="usuario-item" data-id="{{ usuario.id }}">{{ usuario.username }}</li>
+        {% empty %}
+            <li>No hay usuarios registrados.</li>
+        {% endfor %}
+    </ul>
+    
+    <!-- Controles de paginación -->
+    {% if usuarios.has_other_pages %}
+        <div class="pagination">
+            {% if usuarios.has_previous %}
+                <button onclick="window.location.href='?page=1'"><<< </button>
+                <button onclick="window.location.href='?page={{ usuarios.previous_page_number }}'">< </button>
+            {% endif %}
+
+            <span>Página {{ usuarios.number }} de {{ usuarios.paginator.num_pages }}</span>&nbsp;
+
+            {% if usuarios.has_next %}
+                <button onclick="window.location.href='?page={{ usuarios.next_page_number }}'"> ></button>
+                <button onclick="window.location.href='?page={{ usuarios.paginator.num_pages }}'"> >>></button>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if usuarios.has_next %}
+        <button id="show-more" onclick="showMore()">Mostrar más</button>
+    {% endif %}
+
+    <p><a href="{% url 'eliminar_usuario' %}" class="btn-eliminar">Eliminar usuario</a></p>
+
+    <style>
+        .pagination button {
+            padding: 5px 8px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .pagination button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+        }
+
+        .pagination button:active {
+            transform: scale(0.98); /* Efecto al hacer clic */
+        }
+
+        #show-more {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        #show-more:hover {
+            background-color: #0056b3;
+            transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+        }
+
+        #show-more:active {
+            transform: scale(0.98); /* Efecto al hacer clic */
+        }
+
+        .btn-eliminar {
+            margin-top: 20px;
+            display: inline-block;
+            background-color: #dc3545;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-eliminar:hover {
+            background-color: #c82333;
+            transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+        }
+
+        .btn-eliminar:active {
+            transform: scale(0.98); /* Efecto al hacer clic */
+        }
+    </style>
+
+<script>
+    let offset = parseInt('{{ offset|default:0 }}'); // Inicia después de la página actual
+
+    function showMore() {
+        fetch(`?offset=${offset}`, {
+            method: 'GET',
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.usuarios.length > 0) {
+                let userList = document.getElementById('user-list');
+
+                data.usuarios.forEach(usuario => {
+                    let newUserItem = document.createElement('li');
+                    newUserItem.classList.add('usuario-item');
+                    newUserItem.innerText = usuario.username;
+                    userList.appendChild(newUserItem);
+                });
+
+                offset = data.new_offset;  // Se actualiza el offset correctamente
+
+                if (!data.has_next) {
+                    document.getElementById('show-more').style.display = 'none';
+                }
+            }
+        });
+    }
+</script>
+
+
+{% endblock %}

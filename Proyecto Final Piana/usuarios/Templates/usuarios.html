@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block header_title %}Usuarios - Sistema de Compras{% endblock %}
+
+{% block content %}
+    <h2>Bienvenido a la sección de usuarios</h2>
+
+    <p><a href="{% url 'iniciar_sesion' %}">Iniciar sesión</a></p>
+
+    <p><a href="{% url 'registrar_usuario' %}">Registrar Usuarios</a></p>
+    
+    <p><a href="{% url 'listar_usuarios' %}">Ver usuarios registrados</a></p>
+
+{% endblock %}
